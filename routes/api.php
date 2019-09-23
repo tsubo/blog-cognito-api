@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,14 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['middleware' => ['api']], function () {
-    Route::resource('posts', 'PostController', ['except' => ['create', 'edit']]);
+
+Route::get('/posts', 'PostController@index');
+Route::get('/posts/{post}', 'PostController@show');
+
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::resource('posts', 'PostController', ['only' => ['store', 'update', 'destroy']]);
+
+    Route::get('/me', 'ApiController@me');
+    Route::get('/admin', 'ApiController@admin')->middleware('can:admin');
+    Route::get('/manager', 'ApiController@manager')->middleware('can:manager');;
 });
